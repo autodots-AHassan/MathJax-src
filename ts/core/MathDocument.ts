@@ -37,6 +37,7 @@ import { DOMAdaptor } from '../core/DOMAdaptor.js';
 import { BitField, BitFieldClass } from '../util/BitField.js';
 import { PrioritizedList } from '../util/PrioritizedList.js';
 import { handleRetriesFor } from '../util/Retries.js';
+import { localize } from './__locales__/Component.js';
 import { Locale } from '../util/Locale.js';
 
 /*****************************************************************/
@@ -1067,7 +1068,7 @@ export abstract class AbstractMathDocument<N, T, D> implements MathDocument<
         [
           this.mmlFactory.create('mtext', null, [
             (this.mmlFactory.create('text') as TextNode).setText(
-              'Math input error'
+              localize('InputError')
             ),
           ]),
         ]
@@ -1125,7 +1126,7 @@ export abstract class AbstractMathDocument<N, T, D> implements MathDocument<
               'line-height': 'normal',
             },
           },
-          [this.adaptor.text('Math output error')]
+          [this.adaptor.text(localize('OutputError'))]
         ),
       ]
     );
