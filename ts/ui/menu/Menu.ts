@@ -106,7 +106,6 @@ export interface MenuSettings {
   infoType: boolean;
   inTabOrder: boolean;
   locale: string;
-  language: string;
   magnification: string;
   magnify: string;
   speech: boolean;
@@ -155,7 +154,7 @@ export class Menu {
       zoom: 'NoZoom',
       zscale: '200%',
       renderer: 'CHTML',
-      language: 'en',
+      locale: 'en',
       alt: true,
       cmd: false,
       ctrl: false,
@@ -556,7 +555,7 @@ export class Menu {
    */
   protected initSettings() {
     this.settings = this.options.settings;
-    this.settings.language = MathJax.config.locale ?? Locale.current;
+    this.settings.locale = MathJax.config.locale ?? Locale.current;
     this.jax = this.options.jax;
     const jax = this.document.outputJax;
     this.jax[jax.name] = jax;
@@ -598,7 +597,6 @@ export class Menu {
         this.variable<string>('overflow', (overflow) =>
           this.setOverflow(overflow)
         ),
-        this.variable<string>('language', (locale) => this.setLanguage(locale)),
         this.variable<boolean>('breakInline', (breaks) =>
           this.setInlineBreaks(breaks)
         ),
@@ -781,8 +779,6 @@ export class Menu {
             'Clearspeak',
             this.radioGroup('speechRules', '', ['clearspeak-default'])
           ),
-          this.rule(),
-          this.submenu('A11yLanguage'),
         ]),
         this.submenu('Braille', [
           this.checkbox('Generate', 'braille'),
@@ -992,7 +988,7 @@ export class Menu {
       } else {
         localStorage.removeItem(Menu.MENU_STORAGE);
       }
-      localStorage.setItem(Menu.LOCALE_STORAGE, this.settings.language);
+      localStorage.setItem(Menu.LOCALE_STORAGE, this.settings.locale);
     } catch (err) {
       Locale.warn(COMPONENT, 'Warn/StorageError', err.message);
     }
@@ -1308,13 +1304,6 @@ export class Menu {
    */
   protected setLocale(locale: string) {
     this.document.options.sre.locale = locale;
-    this.rerender(STATE.COMPILED);
-  }
-
-  /**
-   * @param {string} locale  The interface language locale
-   */
-  protected setLanguage(locale: string) {
     Locale.setLocale(locale).then(() => {
       this.initMenu();
       this.rerender(STATE.COMPILED);
@@ -1911,14 +1900,14 @@ export class Menu {
    * @returns {object[]}   The submenu definitions
    */
   public languageSubmenu(): object[] {
-    return (locales as [string, string][]).map(([locale, name]) => {
+    return [...(locales as [string, string, boolean][]).map(([locale, name, speechOnly]) => {
       return {
         type: 'radio',
         id: locale,
-        content: `${name} (${locale})`,
-        variable: 'language',
+        content: `${speechOnly ? '\u2022 ' : ''}${name} (${locale})`,
+        variable: 'locale',
       };
-    });
+    }), this.rule(), this.label('Label/SpeechOnly')];
   }
 
   /**
